@@ -1,10 +1,10 @@
-﻿# RiderGuy Environment Validation Script
+# RiderGuy Environment Validation Script
 
 param(
     [switch]$InstallMissing
 )
 
-Write-Host "`nðŸ” RIDERGUY ENVIRONMENT VALIDATION`n" -ForegroundColor Cyan
+Write-Host "`n=== RIDERGUY ENVIRONMENT VALIDATION ===`n" -ForegroundColor Cyan
 
 $failed = $false
 $projectRoot = Split-Path -Parent $PSScriptRoot
@@ -16,14 +16,14 @@ try {
     if ($nodeVersion -match "v(\d+)") {
         $majorVersion = [int]$matches[1]
         if ($majorVersion -ge 20) {
-            Write-Host "  âœ… Node.js $nodeVersion (OK)" -ForegroundColor Green
+            Write-Host "  [OK] Node.js $nodeVersion" -ForegroundColor Green
         } else {
-            Write-Host "  âŒ Node.js $nodeVersion (Need v20+)" -ForegroundColor Red
+            Write-Host "  [ERROR] Node.js $nodeVersion (Need v20+)" -ForegroundColor Red
             $failed = $true
         }
     }
 } catch {
-    Write-Host "  âŒ Node.js not found" -ForegroundColor Red
+    Write-Host "  [ERROR] Node.js not found" -ForegroundColor Red
     $failed = $true
 }
 
@@ -31,28 +31,28 @@ try {
 Write-Host "Checking npm..." -ForegroundColor Yellow
 try {
     $npmVersion = npm --version 2>$null
-    Write-Host "  âœ… npm v$npmVersion" -ForegroundColor Green
+    Write-Host "  [OK] npm v$npmVersion" -ForegroundColor Green
 } catch {
-    Write-Host "  âŒ npm not found" -ForegroundColor Red
+    Write-Host "  [ERROR] npm not found" -ForegroundColor Red
     $failed = $true
 }
 
-# Check Go (optional for dispatch/telemetry services)
+# Check Go (optional)
 Write-Host "Checking Go..." -ForegroundColor Yellow
 try {
     $goVersion = go version 2>$null
-    Write-Host "  âœ… $goVersion" -ForegroundColor Green
+    Write-Host "  [OK] $goVersion" -ForegroundColor Green
 } catch {
-    Write-Host "  âš ï¸  Go not found (optional)" -ForegroundColor Yellow
+    Write-Host "  [WARN] Go not found (optional)" -ForegroundColor Yellow
 }
 
-# Check Python (optional for analytics service)
+# Check Python (optional)
 Write-Host "Checking Python..." -ForegroundColor Yellow
 try {
     $pythonVersion = python --version 2>$null
-    Write-Host "  âœ… $pythonVersion" -ForegroundColor Green
+    Write-Host "  [OK] $pythonVersion" -ForegroundColor Green
 } catch {
-    Write-Host "  âš ï¸  Python not found (optional)" -ForegroundColor Yellow
+    Write-Host "  [WARN] Python not found (optional)" -ForegroundColor Yellow
 }
 
 # Check project structure
@@ -67,9 +67,9 @@ $requiredDirs = @(
 foreach ($dir in $requiredDirs) {
     $fullPath = Join-Path $projectRoot $dir
     if (Test-Path $fullPath) {
-        Write-Host "  âœ… $dir" -ForegroundColor Green
+        Write-Host "  [OK] $dir" -ForegroundColor Green
     } else {
-        Write-Host "  âŒ $dir (missing)" -ForegroundColor Red
+        Write-Host "  [ERROR] $dir (missing)" -ForegroundColor Red
         $failed = $true
     }
 }
@@ -78,16 +78,16 @@ foreach ($dir in $requiredDirs) {
 Write-Host "`nChecking dependencies..." -ForegroundColor Yellow
 $nodeModules = Join-Path $projectRoot "node_modules"
 if (Test-Path $nodeModules) {
-    Write-Host "  âœ… Root node_modules exists" -ForegroundColor Green
+    Write-Host "  [OK] Root node_modules exists" -ForegroundColor Green
 } else {
-    Write-Host "  âŒ Root node_modules missing" -ForegroundColor Red
+    Write-Host "  [ERROR] Root node_modules missing" -ForegroundColor Red
     if ($InstallMissing) {
-        Write-Host "  ðŸ“¦ Installing dependencies..." -ForegroundColor Cyan
+        Write-Host "  Installing dependencies..." -ForegroundColor Cyan
         Push-Location $projectRoot
         npm install
         Pop-Location
     } else {
-        Write-Host "  ðŸ’¡ Run: npm install" -ForegroundColor Yellow
+        Write-Host "  TIP: Run 'npm install'" -ForegroundColor Yellow
         $failed = $true
     }
 }
@@ -97,21 +97,20 @@ Write-Host "`nChecking environment variables..." -ForegroundColor Yellow
 $envFile = Join-Path $projectRoot ".env"
 
 if (Test-Path $envFile) {
-    Write-Host "  âœ… .env file exists" -ForegroundColor Green
+    Write-Host "  [OK] .env file exists" -ForegroundColor Green
 } else {
-    Write-Host "  âš ï¸  .env file not found" -ForegroundColor Yellow
-    Write-Host "  ðŸ’¡ Copy .env.example to .env and configure" -ForegroundColor Yellow
+    Write-Host "  [WARN] .env file not found" -ForegroundColor Yellow
+    Write-Host "  TIP: Copy .env.example to .env and configure" -ForegroundColor Yellow
 }
 
 # Summary
-Write-Host "`n" -NoNewline
+Write-Host ""
 if ($failed) {
-    Write-Host "âŒ VALIDATION FAILED" -ForegroundColor Red
+    Write-Host "[FAILED] VALIDATION FAILED" -ForegroundColor Red
     Write-Host "Fix the issues above before starting services.`n" -ForegroundColor Yellow
     exit 1
 } else {
-    Write-Host "âœ… ENVIRONMENT VALIDATED" -ForegroundColor Green
+    Write-Host "[SUCCESS] ENVIRONMENT VALIDATED" -ForegroundColor Green
     Write-Host "All checks passed! You can start services.`n" -ForegroundColor Green
     exit 0
 }
-
