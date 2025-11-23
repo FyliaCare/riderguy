@@ -65,7 +65,7 @@ jobs:
       - name: Build PWA
         run: npm run build --workspace=rider-pwa
         env:
-          NEXT_PUBLIC_API_URL: ${{ secrets.API_URL }}
+          NEXT_PUBLIC_API_URL: https://api.riderguy.com
           NEXT_PUBLIC_MAPBOX_TOKEN: ${{ secrets.MAPBOX_TOKEN }}
 
       - name: Upload build artifact

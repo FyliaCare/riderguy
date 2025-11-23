@@ -252,8 +252,8 @@ Write-Host ""
 
 if ($errors.Count -gt 0) {
     Write-Host "❌ ERRORS (Must Fix):" -ForegroundColor Red
-    foreach ($error in $errors) {
-        Write-Host "  • $error" -ForegroundColor Red
+    foreach ($err in $errors) {
+        Write-Host "  • $err" -ForegroundColor Red
     }
     Write-Host ""
 }
