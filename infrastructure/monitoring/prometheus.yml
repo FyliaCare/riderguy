@@ -1,0 +1,75 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'riderguy'
+    environment: 'development'
+
+scrape_configs:
+  # Auth Service
+  - job_name: 'auth-service'
+    static_configs:
+      - targets: ['localhost:4001']
+    metrics_path: '/metrics'
+
+  # Rider Profile Service
+  - job_name: 'rider-profile-service'
+    static_configs:
+      - targets: ['localhost:4002']
+    metrics_path: '/metrics'
+
+  # Task Order Service
+  - job_name: 'task-order-service'
+    static_configs:
+      - targets: ['localhost:4003']
+    metrics_path: '/metrics'
+
+  # Dispatch Service
+  - job_name: 'dispatch-service'
+    static_configs:
+      - targets: ['localhost:4004']
+    metrics_path: '/metrics'
+
+  # Wallet Service
+  - job_name: 'wallet-service'
+    static_configs:
+      - targets: ['localhost:4005']
+    metrics_path: '/metrics'
+
+  # Training Service
+  - job_name: 'training-service'
+    static_configs:
+      - targets: ['localhost:4006']
+    metrics_path: '/metrics'
+
+  # Community Service
+  - job_name: 'community-service'
+    static_configs:
+      - targets: ['localhost:4007']
+    metrics_path: '/metrics'
+
+  # Welfare Service
+  - job_name: 'welfare-service'
+    static_configs:
+      - targets: ['localhost:4008']
+    metrics_path: '/metrics'
+
+  # PostgreSQL Exporter
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['localhost:9187']
+
+  # Redis Exporter
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['localhost:9121']
+
+  # Kafka Exporter
+  - job_name: 'kafka'
+    static_configs:
+      - targets: ['localhost:9308']
+
+  # Node Exporter (system metrics)
+  - job_name: 'node'
+    static_configs:
+      - targets: ['localhost:9100']

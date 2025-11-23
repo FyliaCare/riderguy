@@ -1,0 +1,30 @@
+# Dockerfile for Analytics Service (Python)
+
+FROM python:3.11-slim
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements
+COPY services/analytics-service/requirements.txt .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy source code
+COPY services/analytics-service/ .
+
+# Create non-root user
+RUN useradd -m -u 1001 appuser && chown -R appuser:appuser /app
+USER appuser
+
+EXPOSE 4013
+
+ENV PORT 4013
+ENV PYTHONUNBUFFERED 1
+
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "4013"]

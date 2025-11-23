@@ -1,0 +1,61 @@
+# Multi-stage Dockerfile for Rider PWA (Next.js)
+
+# Stage 1: Dependencies
+FROM node:20-alpine AS deps
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+
+# Copy root package files
+COPY package.json package-lock.json* ./
+# Copy workspace package files
+COPY apps/rider-pwa/package.json ./apps/rider-pwa/
+COPY packages/shared-types/package.json* ./packages/shared-types/
+
+# Install dependencies
+RUN npm ci
+
+# Stage 2: Builder
+FROM node:20-alpine AS builder
+WORKDIR /app
+
+# Copy dependencies
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/apps/rider-pwa/node_modules ./apps/rider-pwa/node_modules
+
+# Copy source code
+COPY apps/rider-pwa ./apps/rider-pwa
+COPY packages ./packages
+COPY turbo.json package.json ./
+
+# Build the application
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
+
+WORKDIR /app/apps/rider-pwa
+RUN npm run build
+
+# Stage 3: Runner
+FROM node:20-alpine AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+# Copy public files
+COPY --from=builder /app/apps/rider-pwa/public ./public
+
+# Copy built files
+COPY --from=builder --chown=nextjs:nodejs /app/apps/rider-pwa/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/apps/rider-pwa/.next/static ./.next/static
+
+USER nextjs
+
+EXPOSE 3000
+
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+
+CMD ["node", "server.js"]

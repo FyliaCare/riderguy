@@ -1,0 +1,258 @@
+# Render Blueprint for RiderGuy Platform
+# https://render.com/docs/blueprint-spec
+
+services:
+  # Rider PWA - Next.js App
+  - type: web
+    name: riderguy-rider-pwa
+    env: node
+    region: oregon
+    plan: starter
+    buildCommand: npm install && cd apps/rider-pwa && npm install && npm run build
+    startCommand: cd apps/rider-pwa && npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: NEXT_PUBLIC_API_URL
+        sync: false
+      - key: NEXT_PUBLIC_MAPBOX_TOKEN
+        sync: false
+      - key: NEXT_PUBLIC_APP_URL
+        sync: false
+
+  # Dispatcher Dashboard - React/Vite App
+  - type: web
+    name: riderguy-dispatcher-dashboard
+    env: node
+    region: oregon
+    plan: starter
+    buildCommand: npm install && cd apps/dispatcher-dashboard && npm install && npm run build
+    startCommand: npm install -g serve && cd apps/dispatcher-dashboard && serve -s dist -l $PORT
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: VITE_API_URL
+        sync: false
+
+  # Admin Portal - React/Vite App
+  - type: web
+    name: riderguy-admin-portal
+    env: node
+    region: oregon
+    plan: starter
+    buildCommand: npm install && cd apps/admin-portal && npm install && npm run build
+    startCommand: npm install -g serve && cd apps/admin-portal && serve -s dist -l $PORT
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: VITE_API_URL
+        sync: false
+
+  # Business Dashboard - React/Vite App
+  - type: web
+    name: riderguy-business-dashboard
+    env: node
+    region: oregon
+    plan: starter
+    buildCommand: npm install && cd apps/business-dashboard && npm install && npm run build
+    startCommand: npm install -g serve && cd apps/business-dashboard && serve -s dist -l $PORT
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: VITE_API_URL
+        sync: false
+
+  # Public Website - Next.js App
+  - type: web
+    name: riderguy-public-website
+    env: node
+    region: oregon
+    plan: starter
+    buildCommand: npm install && cd apps/public-website && npm install && npm run build
+    startCommand: cd apps/public-website && npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: NEXT_PUBLIC_API_URL
+        sync: false
+
+  # Auth Service - Node.js/TypeScript
+  - type: web
+    name: riderguy-auth-service
+    env: node
+    region: oregon
+    plan: starter
+    buildCommand: npm install && cd services/auth-service && npm install && npm run build
+    startCommand: cd services/auth-service && npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4001
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: JWT_EXPIRY
+        value: 15m
+      - key: JWT_REFRESH_EXPIRY
+        value: 7d
+
+  # Rider Profile Service - Node.js/TypeScript
+  - type: web
+    name: riderguy-rider-profile-service
+    env: node
+    region: oregon
+    plan: starter
+    buildCommand: npm install && cd services/rider-profile-service && npm install && npm run build
+    startCommand: cd services/rider-profile-service && npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4002
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+
+  # Notification Service - Node.js/TypeScript
+  - type: web
+    name: riderguy-notification-service
+    env: node
+    region: oregon
+    plan: starter
+    buildCommand: npm install && cd services/notification-service && npm install && npm run build
+    startCommand: cd services/notification-service && npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4005
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+
+  # Wallet Service - Node.js/TypeScript
+  - type: web
+    name: riderguy-wallet-service
+    env: node
+    region: oregon
+    plan: starter
+    buildCommand: npm install && cd services/wallet-service && npm install && npm run build
+    startCommand: cd services/wallet-service && npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4006
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+
+  # Community Service - Node.js/TypeScript
+  - type: web
+    name: riderguy-community-service
+    env: node
+    region: oregon
+    plan: starter
+    buildCommand: npm install && cd services/community-service && npm install && npm run build
+    startCommand: cd services/community-service && npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4008
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+
+  # XP Level Service - Node.js/TypeScript
+  - type: web
+    name: riderguy-xp-level-service
+    env: node
+    region: oregon
+    plan: starter
+    buildCommand: npm install && cd services/xp-level-service && npm install && npm run build
+    startCommand: cd services/xp-level-service && npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4007
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+
+  # Dispatch Service - Go
+  - type: web
+    name: riderguy-dispatch-service
+    env: go
+    region: oregon
+    plan: starter
+    buildCommand: cd services/dispatch-service && go build -o bin/dispatch-service
+    startCommand: cd services/dispatch-service && ./bin/dispatch-service
+    healthCheckPath: /health
+    envVars:
+      - key: GO_ENV
+        value: production
+      - key: PORT
+        value: 4004
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+
+  # Analytics Service - Python
+  - type: web
+    name: riderguy-analytics-service
+    env: python
+    region: oregon
+    plan: starter
+    buildCommand: cd services/analytics-service && pip install -r requirements.txt
+    startCommand: cd services/analytics-service && uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_ENV
+        value: production
+      - key: PORT
+        value: 4013
+      - key: DATABASE_URL
+        sync: false
+
+  # Redis - Background Worker/Cache
+  - type: pserv
+    name: riderguy-redis
+    env: docker
+    region: oregon
+    plan: starter
+    image:
+      url: redis:7-alpine
+    disk:
+      name: redis-data
+      mountPath: /data
+      sizeGB: 1
